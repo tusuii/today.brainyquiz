@@ -1,0 +1,385 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics Dashboard - Quiz App{% endblock %}
+
+{% block extra_css %}
+<style>
+    .chart-container {
+        position: relative;
+        height: 300px;
+        margin-bottom: 30px;
+    }
+    .dashboard-card {
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    .dashboard-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+    }
+    .card-header {
+        background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+        color: white;
+        font-weight: 500;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col">
+            <h1>Analytics Dashboard</h1>
+            <p class="lead">Visual insights into quiz performance and user engagement</p>
+        </div>
+        <div class="col-auto">
+            <a href="{{ url_for('admin.index') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <!-- First row of charts -->
+    <div class="row">
+        <!-- Quiz Completion Rate Chart -->
+        <div class="col-md-6 mb-4">
+            <div class="card dashboard-card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0">Quiz Completion Rates</h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="completionRateChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Average Scores Chart -->
+        <div class="col-md-6 mb-4">
+            <div class="card dashboard-card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0">Average Quiz Scores</h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="averageScoresChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Second row of charts -->
+    <div class="row">
+        <!-- Time Distribution Chart -->
+        <div class="col-md-6 mb-4">
+            <div class="card dashboard-card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0">Quiz Completion Time Distribution</h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="timeDistributionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Users Chart -->
+        <div class="col-md-6 mb-4">
+            <div class="card dashboard-card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0">Top Performing Users</h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="userPerformanceChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Third row - Activity Timeline -->
+    <div class="row">
+        <div class="col-12 mb-4">
+            <div class="card dashboard-card">
+                <div class="card-header">
+                    <h5 class="mb-0">Quiz Activity (Last 30 Days)</h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="activityTimelineChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Function to generate random colors for charts
+    function generateColors(count) {
+        const colors = [];
+        for (let i = 0; i < count; i++) {
+            const hue = (i * 137) % 360; // Use golden angle for good distribution
+            colors.push(`hsla(${hue}, 70%, 60%, 0.7)`);
+        }
+        return colors;
+    }
+
+    // Wait for DOM to be ready
+    document.addEventListener('DOMContentLoaded', function() {
+        // Fetch data for all charts
+        Promise.all([
+            fetch('/api/quiz-completion-rate').then(res => res.json()),
+            fetch('/api/average-scores').then(res => res.json()),
+            fetch('/api/time-distribution').then(res => res.json()),
+            fetch('/api/user-performance').then(res => res.json()),
+            fetch('/api/activity-over-time').then(res => res.json())
+        ]).then(([completionData, scoresData, timeData, userData, activityData]) => {
+            // 1. Quiz Completion Rate Chart
+            const completionCtx = document.getElementById('completionRateChart').getContext('2d');
+            const completionLabels = completionData.map(item => item.quiz_title);
+            const completionRates = completionData.map(item => item.completion_rate);
+            const completionColors = generateColors(completionLabels.length);
+            
+            new Chart(completionCtx, {
+                type: 'bar',
+                data: {
+                    labels: completionLabels,
+                    datasets: [{
+                        label: 'Completion Rate (%)',
+                        data: completionRates,
+                        backgroundColor: completionColors,
+                        borderColor: completionColors.map(c => c.replace('0.7', '1')),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.raw}% completion rate`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'Completion Rate (%)'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // 2. Average Scores Chart
+            const scoresCtx = document.getElementById('averageScoresChart').getContext('2d');
+            const scoresLabels = scoresData.map(item => item.quiz_title);
+            const scoresValues = scoresData.map(item => item.avg_score_percentage);
+            const scoresColors = generateColors(scoresLabels.length);
+            
+            new Chart(scoresCtx, {
+                type: 'horizontalBar',
+                type: 'bar',
+                data: {
+                    labels: scoresLabels,
+                    datasets: [{
+                        label: 'Average Score (%)',
+                        data: scoresValues,
+                        backgroundColor: scoresColors,
+                        borderColor: scoresColors.map(c => c.replace('0.7', '1')),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.raw}% average score`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'Average Score (%)'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // 3. Time Distribution Chart
+            const timeCtx = document.getElementById('timeDistributionChart').getContext('2d');
+            const timeLabels = timeData.map(item => item.range);
+            const timeCounts = timeData.map(item => item.count);
+            const timeColors = [
+                'rgba(255, 99, 132, 0.7)',
+                'rgba(54, 162, 235, 0.7)',
+                'rgba(255, 206, 86, 0.7)',
+                'rgba(75, 192, 192, 0.7)',
+                'rgba(153, 102, 255, 0.7)'
+            ];
+            
+            new Chart(timeCtx, {
+                type: 'pie',
+                data: {
+                    labels: timeLabels,
+                    datasets: [{
+                        data: timeCounts,
+                        backgroundColor: timeColors,
+                        borderColor: timeColors.map(c => c.replace('0.7', '1')),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = Math.round((context.raw / total) * 100);
+                                    return `${context.raw} attempts (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // 4. User Performance Chart
+            const userCtx = document.getElementById('userPerformanceChart').getContext('2d');
+            const userLabels = userData.map(item => item.username);
+            const userScores = userData.map(item => item.avg_score);
+            const userColors = generateColors(userLabels.length);
+            
+            new Chart(userCtx, {
+                type: 'bar',
+                data: {
+                    labels: userLabels,
+                    datasets: [{
+                        label: 'Average Score (%)',
+                        data: userScores,
+                        backgroundColor: userColors,
+                        borderColor: userColors.map(c => c.replace('0.7', '1')),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const user = userData[context.dataIndex];
+                                    return [
+                                        `Average Score: ${user.avg_score}%`,
+                                        `Quizzes Taken: ${user.quizzes_taken}`
+                                    ];
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'Average Score (%)'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // 5. Activity Timeline Chart
+            const activityCtx = document.getElementById('activityTimelineChart').getContext('2d');
+            const activityDates = activityData.map(item => item.date);
+            const activityCounts = activityData.map(item => item.attempts);
+            
+            new Chart(activityCtx, {
+                type: 'line',
+                data: {
+                    labels: activityDates,
+                    datasets: [{
+                        label: 'Quiz Attempts',
+                        data: activityCounts,
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 3,
+                        pointHoverRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                title: function(context) {
+                                    return `Date: ${context[0].label}`;
+                                },
+                                label: function(context) {
+                                    return `${context.raw} quiz attempts`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Number of Attempts'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Date'
+                            }
+                        }
+                    }
+                }
+            });
+        }).catch(error => {
+            console.error('Error loading chart data:', error);
+            document.querySelectorAll('.chart-container').forEach(container => {
+                container.innerHTML = '<div class="alert alert-danger">Error loading chart data. Please try again later.</div>';
+            });
+        });
+    });
+</script>
+{% endblock %}

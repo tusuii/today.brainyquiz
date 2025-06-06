@@ -34,6 +34,12 @@ def index():
                           user_count=user_count, 
                           attempt_count=attempt_count)
 
+@admin.route('/analytics')
+@admin_required
+def analytics_dashboard():
+    """Visual analytics dashboard"""
+    return render_template('admin/analytics_dashboard.html')
+
 @admin.route('/quizzes')
 @admin_required
 def list_quizzes():
