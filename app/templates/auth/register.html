@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% block title %}Register - Quiz App{% endblock %}
+
+{% block extra_css %}
+<style>
+    .auth-container {
+        margin-top: 2rem;
+        margin-bottom: 2rem;
+    }
+    
+    .auth-card {
+        border-radius: 1rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        overflow: hidden;
+        transition: transform 0.3s ease;
+    }
+    
+    .auth-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .card-header {
+        padding: 1.25rem;
+    }
+    
+    .auth-icon {
+        font-size: 1.5rem;
+        margin-right: 0.5rem;
+        vertical-align: middle;
+    }
+    
+    .form-control {
+        border-radius: 0.5rem;
+        padding: 0.75rem 1rem;
+    }
+    
+    .form-control:focus {
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+    
+    .btn {
+        border-radius: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .btn-success {
+        background: linear-gradient(45deg, #1cc88a, #169969);
+        border: none;
+    }
+    
+    .card-footer {
+        background-color: rgba(0,0,0,0.03);
+        padding: 1rem;
+    }
+    
+    .card-footer a {
+        color: #4e73df;
+        font-weight: 500;
+        text-decoration: none;
+    }
+    
+    .card-footer a:hover {
+        text-decoration: underline;
+    }
+    
+    @media (max-width: 767.98px) {
+        .auth-container {
+            margin-top: 1rem;
+        }
+        
+        .card-header h4 {
+            font-size: 1.25rem;
+        }
+    }
+    
+    .form-floating {
+        margin-bottom: 1rem;
+    }
+    
+    .form-floating label {
+        padding: 1rem 1rem;
+    }
+    
+    .form-floating .form-control {
+        height: calc(3.5rem + 2px);
+        line-height: 1.25;
+    }
+    
+    .input-group-text {
+        background-color: rgba(0,0,0,0.03);
+        border-color: #ced4da;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center auth-container">
+    <div class="col-lg-6 col-md-8 col-sm-10">
+        <div class="auth-card card">
+            <div class="card-header bg-success text-white">
+                <h4 class="mb-0"><i class="fas fa-user-plus auth-icon"></i>Create Your Account</h4>
+            </div>
+            <div class="card-body p-4">
+                <p class="text-muted mb-4">Join our community and start taking quizzes today!</p>
+                
+                <form method="POST" action="{{ url_for('auth.register') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-user"></i></span>
+                            <input type="text" class="form-control" id="username" name="username" 
+                                   placeholder="Choose a username" required>
+                        </div>
+                        <div class="form-text">Your unique identifier for the platform</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                            <input type="email" class="form-control" id="email" name="email" 
+                                   placeholder="Enter your email" required>
+                        </div>
+                        <div class="form-text">We'll never share your email with anyone else</div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="password" class="form-label">Password</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                            <input type="password" class="form-control" id="password" name="password" 
+                                   placeholder="Create a password" required>
+                        </div>
+                        <div class="form-text">Choose a strong password to secure your account</div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-success">Create Account</button>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer text-center">
+                <p class="mb-0">Already have an account? <a href="{{ url_for('auth.login') }}">Login here</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Add FontAwesome if not already included
+    if (!document.querySelector('link[href*="fontawesome"]')) {
+        const fontAwesome = document.createElement('link');
+        fontAwesome.rel = 'stylesheet';
+        fontAwesome.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css';
+        document.head.appendChild(fontAwesome);
+    }
+</script>
+{% endblock %}

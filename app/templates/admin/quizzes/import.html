@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Import Quiz - Quiz App{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col">
+            <h1>Import Quiz</h1>
+            <p class="lead">Upload a YAML file to import a new quiz</p>
+        </div>
+        <div class="col-auto">
+            <a href="{{ url_for('admin.list_quizzes') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Quizzes
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Upload Quiz File</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        
+                        <div class="mb-3">
+                            <label for="quiz_file" class="form-label">Quiz YAML File</label>
+                            <input type="file" class="form-control" id="quiz_file" name="quiz_file" accept=".yml,.yaml" required>
+                            <div class="form-text">Upload a YAML file containing quiz data</div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-file-import"></i> Import Quiz
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card mt-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">YAML Format</h5>
+                </div>
+                <div class="card-body">
+                    <p>The YAML file should follow this format:</p>
+                    <pre class="bg-light p-3 rounded">
+title: Quiz Title
+description: Quiz Description
+questions:
+  - text: Question 1 text
+    options:
+      - text: Option 1 text
+        is_correct: true
+      - text: Option 2 text
+        is_correct: false
+      - text: Option 3 text
+        is_correct: false
+      - text: Option 4 text
+        is_correct: false
+  - text: Question 2 text
+    options:
+      - text: Option 1 text
+        is_correct: false
+      - text: Option 2 text
+        is_correct: true
+      - text: Option 3 text
+        is_correct: false
+      - text: Option 4 text
+        is_correct: false</pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

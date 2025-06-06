@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}{{ quiz.title }} - Quiz App{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h1>{{ quiz.title }}</h1>
+        <p class="lead">{{ quiz.description }}</p>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <h5 class="card-title">Quiz Details</h5>
+        <p class="card-text">This quiz contains {{ quiz.questions.count() }} questions.</p>
+        <a href="{{ url_for('quiz.start_quiz', quiz_id=quiz.id) }}" class="btn btn-primary">Start Quiz</a>
+        <a href="{{ url_for('quiz.list_quizzes') }}" class="btn btn-secondary">Back to Quizzes</a>
+    </div>
+</div>
+{% endblock %}

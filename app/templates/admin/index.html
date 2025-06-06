@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Quiz App{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h1>Admin Dashboard</h1>
+        <p class="lead">Manage quizzes, users, and view results</p>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card admin-dashboard-card card-quiz">
+            <div class="card-body">
+                <h5 class="card-title">Quizzes</h5>
+                <p class="card-text display-4">{{ quiz_count }}</p>
+                <a href="{{ url_for('admin.list_quizzes') }}" class="btn btn-primary">Manage Quizzes</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card admin-dashboard-card card-user">
+            <div class="card-body">
+                <h5 class="card-title">Users</h5>
+                <p class="card-text display-4">{{ user_count }}</p>
+                <a href="{{ url_for('admin.list_users') }}" class="btn btn-success">Manage Users</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card admin-dashboard-card card-attempt">
+            <div class="card-body">
+                <h5 class="card-title">Quiz Attempts</h5>
+                <p class="card-text display-4">{{ attempt_count }}</p>
+                <a href="{{ url_for('admin.view_results') }}" class="btn btn-danger">View Results</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2 d-md-flex">
+                    <a href="{{ url_for('admin.import_quiz') }}" class="btn btn-primary">Import Quiz</a>
+                    <a href="{{ url_for('admin.import_directory') }}" class="btn btn-secondary">Import All Quizzes</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

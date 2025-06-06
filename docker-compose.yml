@@ -1,0 +1,31 @@
+version: '3.3'
+
+services:
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/app
+    environment:
+      - FLASK_APP=app
+      - FLASK_ENV=development
+      - DATABASE_URL=postgresql://quizuser:quizpassword@db:5432/quizdb
+    depends_on:
+      - db
+    restart: always
+
+  db:
+    image: postgres:15
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=quizuser
+      - POSTGRES_PASSWORD=quizpassword
+      - POSTGRES_DB=quizdb
+    ports:
+      - "5433:5432"
+    restart: always
+
+volumes:
+  postgres_data:

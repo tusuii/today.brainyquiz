@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}Quiz Results - Quiz App{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col">
+            <h1>Quiz Results</h1>
+            <p class="lead">View all completed quiz attempts</p>
+        </div>
+        <div class="col-auto">
+            <a href="{{ url_for('admin.index') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header bg-light">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h5 class="mb-0">Quiz Attempts</h5>
+                </div>
+                <div class="col-auto">
+                    <form class="d-flex" method="get">
+                        <select name="quiz_filter" class="form-select form-select-sm me-2">
+                            <option value="">All Quizzes</option>
+                            {% for quiz in quizzes %}
+                            <option value="{{ quiz.id }}" {% if request.args.get('quiz_filter')|int == quiz.id %}selected{% endif %}>
+                                {{ quiz.title }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" class="btn btn-sm btn-primary">Filter</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>User</th>
+                            <th>Quiz</th>
+                            <th>Started</th>
+                            <th>Completed</th>
+                            <th>Duration</th>
+                            <th>Score</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user_quiz in user_quizzes %}
+                        <tr>
+                            <td>{{ user_quiz.id }}</td>
+                            <td>
+                                <a href="{{ url_for('admin.view_user', user_id=user_quiz.user.id) }}">
+                                    {{ user_quiz.user.username }}
+                                </a>
+                            </td>
+                            <td>
+                                <a href="{{ url_for('admin.view_quiz', quiz_id=user_quiz.quiz.id) }}">
+                                    {{ user_quiz.quiz.title }}
+                                </a>
+                            </td>
+                            <td>{{ user_quiz.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                            <td>{{ user_quiz.completed_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                            <td>
+                                {% set duration = (user_quiz.completed_at - user_quiz.created_at).total_seconds() %}
+                                {% if duration < 60 %}
+                                    {{ duration|int }} seconds
+                                {% elif duration < 3600 %}
+                                    {{ (duration / 60)|int }} minutes, {{ (duration % 60)|int }} seconds
+                                {% else %}
+                                    {{ (duration / 3600)|int }} hours, {{ ((duration % 3600) / 60)|int }} minutes
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% set question_count = user_quiz.quiz.questions.count() %}
+                                {{ user_quiz.score }}/{{ question_count }}
+                                ({{ (user_quiz.score / question_count * 100)|round|int if question_count > 0 else 0 }}%)
+                            </td>
+                            <td>
+                                <a href="{{ url_for('admin.view_attempt', attempt_id=user_quiz.id) }}" class="btn btn-sm btn-info">
+                                    <i class="fas fa-eye"></i> View Details
+                                </a>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="8" class="text-center">No completed quiz attempts found</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

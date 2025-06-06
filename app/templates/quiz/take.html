@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Taking {{ quiz.title }} - Quiz App{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h1>{{ quiz.title }}</h1>
+        <p class="lead">Answer all questions and submit your answers.</p>
+    </div>
+</div>
+
+<form id="quiz-form" method="POST" action="{{ url_for('quiz.submit_quiz', user_quiz_id=user_quiz.id) }}" data-user-quiz-id="{{ user_quiz.id }}">
+    {% for question in questions %}
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Question {{ loop.index }}</h5>
+        </div>
+        <div class="card-body">
+            <p class="card-text">{{ question.text }}</p>
+            
+            <div class="mt-3">
+                {% for option in question.options %}
+                <div class="form-check mb-2">
+                    <input class="form-check-input option-input" type="radio" name="question_{{ question.id }}" id="option_{{ option.id }}" value="{{ option.id }}" 
+                        {% if user_answers and question.id in user_answers and user_answers[question.id] == option.id %}checked{% endif %}>
+                    <label class="form-check-label option-label" for="option_{{ option.id }}">
+                        {{ option.text }}
+                    </label>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    
+    <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-4">
+        <a href="{{ url_for('quiz.list_quizzes') }}" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-primary">Submit Answers</button>
+    </div>
+</form>
+{% endblock %}

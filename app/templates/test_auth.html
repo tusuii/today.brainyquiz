@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Authentication Test - Quiz App{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3>Authentication Test</h3>
+                </div>
+                <div class="card-body">
+                    <h4>Authentication Status</h4>
+                    <p><strong>Authenticated:</strong> {{ current_user.is_authenticated }}</p>
+                    {% if current_user.is_authenticated %}
+                        <p><strong>User ID:</strong> {{ current_user.id }}</p>
+                        <p><strong>Username:</strong> {{ current_user.username }}</p>
+                        <p><strong>Is Admin:</strong> {{ current_user.is_admin }}</p>
+                        
+                        <h4 class="mt-4">Session Information</h4>
+                        <pre>{{ session_data }}</pre>
+                        
+                        <h4 class="mt-4">Actions</h4>
+                        <div class="d-grid gap-2">
+                            <a href="{{ url_for('quiz.list_quizzes') }}" class="btn btn-primary">Go to Quiz List</a>
+                            <a href="{{ url_for('auth.logout') }}" class="btn btn-danger">Logout</a>
+                        </div>
+                    {% else %}
+                        <p>You are not logged in.</p>
+                        <div class="d-grid gap-2">
+                            <a href="{{ url_for('auth.login') }}" class="btn btn-primary">Login</a>
+                            <a href="{{ url_for('auth.register') }}" class="btn btn-secondary">Register</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

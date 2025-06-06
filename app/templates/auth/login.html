@@ -1,0 +1,264 @@
+{% extends "base.html" %}
+
+{% block title %}Login - Quiz App{% endblock %}
+
+{% block extra_css %}
+<style>
+    .auth-container {
+        margin-top: 2rem;
+        margin-bottom: 2rem;
+    }
+    
+    .auth-card {
+        border-radius: 1rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        overflow: hidden;
+        transition: transform 0.3s ease;
+        margin-bottom: 1.5rem;
+    }
+    
+    .auth-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .card-header {
+        padding: 1.25rem;
+    }
+    
+    .auth-icon {
+        font-size: 1.5rem;
+        margin-right: 0.5rem;
+        vertical-align: middle;
+    }
+    
+    .form-control {
+        border-radius: 0.5rem;
+        padding: 0.75rem 1rem;
+    }
+    
+    .form-control:focus {
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+    
+    .btn {
+        border-radius: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(45deg, #4e73df, #224abe);
+        border: none;
+    }
+    
+    .btn-success {
+        background: linear-gradient(45deg, #1cc88a, #169969);
+        border: none;
+    }
+    
+    .tab-content {
+        padding: 1.5rem;
+    }
+    
+    .nav-tabs .nav-link {
+        font-weight: 500;
+        padding: 1rem 1.5rem;
+        border: none;
+        border-radius: 0;
+    }
+    
+    .nav-tabs .nav-link.active {
+        background-color: transparent;
+        border-bottom: 3px solid #4e73df;
+        color: #4e73df;
+    }
+    
+    @media (max-width: 767.98px) {
+        .auth-container {
+            margin-top: 1rem;
+        }
+        
+        .card-header h4 {
+            font-size: 1.25rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center auth-container">
+    <div class="col-lg-10 col-md-12">
+        <!-- Mobile Tabs Navigation -->
+        <ul class="nav nav-tabs d-md-none mb-4" id="authTabs" role="tablist">
+            <li class="nav-item" role="presentation" style="width: 50%">
+                <button class="nav-link active w-100" id="login-tab" data-bs-toggle="tab" data-bs-target="#login-pane" type="button" role="tab" aria-selected="true">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </button>
+            </li>
+            <li class="nav-item" role="presentation" style="width: 50%">
+                <button class="nav-link w-100" id="register-tab" data-bs-toggle="tab" data-bs-target="#register-pane" type="button" role="tab" aria-selected="false">
+                    <i class="fas fa-user-plus"></i> Register
+                </button>
+            </li>
+        </ul>
+        
+        <!-- Tab Content for Mobile -->
+        <div class="tab-content d-md-none">
+            <!-- Login Tab (Mobile) -->
+            <div class="tab-pane fade show active" id="login-pane" role="tabpanel">
+                <div class="auth-card card">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0"><i class="fas fa-sign-in-alt auth-icon"></i>Login</h4>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="{{ url_for('auth.login') }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <div class="mb-3">
+                                <label for="username-mobile" class="form-label">Username</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                    <input type="text" class="form-control" id="username-mobile" name="username" placeholder="Enter your username" required>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label for="password-mobile" class="form-label">Password</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                    <input type="password" class="form-control" id="password-mobile" name="password" placeholder="Enter your password" required>
+                                </div>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary">Login</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Register Tab (Mobile) -->
+            <div class="tab-pane fade" id="register-pane" role="tabpanel">
+                <div class="auth-card card">
+                    <div class="card-header bg-success text-white">
+                        <h4 class="mb-0"><i class="fas fa-user-plus auth-icon"></i>Register</h4>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="{{ url_for('auth.register') }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <div class="mb-3">
+                                <label for="reg-username-mobile" class="form-label">Username</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                    <input type="text" class="form-control" id="reg-username-mobile" name="username" placeholder="Choose a username" required>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="reg-email-mobile" class="form-label">Email</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                    <input type="email" class="form-control" id="reg-email-mobile" name="email" placeholder="Enter your email" required>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label for="reg-password-mobile" class="form-label">Password</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                    <input type="password" class="form-control" id="reg-password-mobile" name="password" placeholder="Create a password" required>
+                                </div>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-success">Create Account</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Desktop View -->
+        <div class="row d-none d-md-flex">
+            <!-- Login Form (Desktop) -->
+            <div class="col-md-6">
+                <div class="auth-card card h-100">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0"><i class="fas fa-sign-in-alt auth-icon"></i>Login</h4>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="{{ url_for('auth.login') }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <div class="mb-3">
+                                <label for="username" class="form-label">Username</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                    <input type="text" class="form-control" id="username" name="username" placeholder="Enter your username" required>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label for="password" class="form-label">Password</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                    <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password" required>
+                                </div>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary">Login</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Registration Form (Desktop) -->
+            <div class="col-md-6">
+                <div class="auth-card card h-100">
+                    <div class="card-header bg-success text-white">
+                        <h4 class="mb-0"><i class="fas fa-user-plus auth-icon"></i>Register</h4>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="{{ url_for('auth.register') }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <div class="mb-3">
+                                <label for="reg-username" class="form-label">Username</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                    <input type="text" class="form-control" id="reg-username" name="username" placeholder="Choose a username" required>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="reg-email" class="form-label">Email</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                    <input type="email" class="form-control" id="reg-email" name="email" placeholder="Enter your email" required>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label for="reg-password" class="form-label">Password</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                    <input type="password" class="form-control" id="reg-password" name="password" placeholder="Create a password" required>
+                                </div>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-success">Create Account</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Add FontAwesome if not already included
+    if (!document.querySelector('link[href*="fontawesome"]')) {
+        const fontAwesome = document.createElement('link');
+        fontAwesome.rel = 'stylesheet';
+        fontAwesome.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css';
+        document.head.appendChild(fontAwesome);
+    }
+</script>
+{% endblock %}

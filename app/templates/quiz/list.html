@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Quizzes - Quiz App{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h1>Available Quizzes</h1>
+        <p class="lead">Select a quiz to begin</p>
+    </div>
+</div>
+
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    {% for quiz in quizzes %}
+    <div class="col">
+        <div class="card h-100 quiz-card">
+            <div class="card-body">
+                <h5 class="card-title">{{ quiz.title }} {% if current_user.is_admin %}<span class="badge {% if quiz.is_live_safe %}bg-success{% else %}bg-secondary{% endif %}">{% if quiz.is_live_safe %}Live{% else %}Draft{% endif %}</span>{% endif %}</h5>
+                <p class="card-text">{{ quiz.description }}</p>
+                <p class="card-text"><small class="text-muted">{{ quiz.questions.count() }} questions</small></p>
+            </div>
+            <div class="card-footer bg-transparent">
+                <a href="{{ url_for('quiz.view_quiz', quiz_id=quiz.id) }}" class="btn btn-primary">View Quiz</a>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-12">
+        <div class="alert alert-info">
+            <h4 class="alert-heading">No quizzes available</h4>
+            <p>There are currently no quizzes available. Please check back later.</p>
+            {% if current_user.is_admin %}
+            <hr>
+            <p class="mb-0">As an admin, you can <a href="{{ url_for('admin.import_quiz') }}">import quizzes</a> or <a href="{{ url_for('admin.import_directory') }}">import all quizzes</a> from the quizzes directory.</p>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

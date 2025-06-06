@@ -1,0 +1,79 @@
+/* Custom styles for Quiz App */
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.footer {
+    margin-top: auto;
+}
+
+.quiz-card {
+    margin-bottom: 1.5rem;
+    transition: transform 0.2s;
+}
+
+.quiz-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.option-label {
+    display: block;
+    padding: 10px;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.option-label:hover {
+    background-color: #f8f9fa;
+}
+
+.option-input:checked + .option-label {
+    background-color: #cfe2ff;
+    border-color: #9ec5fe;
+}
+
+.correct-answer {
+    background-color: #d1e7dd !important;
+    border-color: #a3cfbb !important;
+}
+
+.incorrect-answer {
+    background-color: #f8d7da !important;
+    border-color: #f5c2c7 !important;
+}
+
+.quiz-result-summary {
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.admin-dashboard-card {
+    border-left: 4px solid;
+    border-radius: 4px;
+    transition: transform 0.2s;
+}
+
+.admin-dashboard-card:hover {
+    transform: translateY(-5px);
+}
+
+.card-quiz {
+    border-left-color: #0d6efd;
+}
+
+.card-user {
+    border-left-color: #198754;
+}
+
+.card-attempt {
+    border-left-color: #dc3545;
+}

@@ -1,0 +1,43 @@
+title: General Knowledge Quiz
+description: Test your general knowledge with this fun quiz!
+questions:
+  - text: What is the capital of France?
+    options:
+      - text: London
+        correct: false
+      - text: Berlin
+        correct: false
+      - text: Paris
+        correct: true
+      - text: Madrid
+        correct: false
+  - text: Which planet is known as the Red Planet?
+    options:
+      - text: Venus
+        correct: false
+      - text: Mars
+        correct: true
+      - text: Jupiter
+        correct: false
+      - text: Saturn
+        correct: false
+  - text: Who wrote "Romeo and Juliet"?
+    options:
+      - text: Charles Dickens
+        correct: false
+      - text: William Shakespeare
+        correct: true
+      - text: Jane Austen
+        correct: false
+      - text: Mark Twain
+        correct: false
+  - text: What is the chemical symbol for gold?
+    options:
+      - text: Au
+        correct: true
+      - text: Ag
+        correct: false
+      - text: Fe
+        correct: false
+      - text: Gd
+        correct: false

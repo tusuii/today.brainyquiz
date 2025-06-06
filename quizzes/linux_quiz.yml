@@ -1,0 +1,442 @@
+title: Linux Basics Quiz
+description: A multiple-choice quiz to test your fundamental knowledge of the Linux operating system.
+questions:
+  - text: What command is used to list files in a directory?
+    options:
+      - text: ls
+        is_correct: true
+      - text: cd
+        is_correct: false
+      - text: mkdir
+        is_correct: false
+      - text: rm
+        is_correct: false
+
+  - text: Which command is used to change directories in Linux?
+    options:
+      - text: cd
+        is_correct: true
+      - text: ls
+        is_correct: false
+      - text: pwd
+        is_correct: false
+      - text: mv
+        is_correct: false
+
+  - text: What command displays the current working directory?
+    options:
+      - text: pwd
+        is_correct: true
+      - text: whoami
+        is_correct: false
+      - text: cd
+        is_correct: false
+      - text: echo
+        is_correct: false
+
+  - text: Which command is used to remove files?
+    options:
+      - text: rm
+        is_correct: true
+      - text: rmdir
+        is_correct: false
+      - text: del
+        is_correct: false
+      - text: mv
+        is_correct: false
+
+  - text: What command is used to move or rename a file?
+    options:
+      - text: mv
+        is_correct: true
+      - text: cp
+        is_correct: false
+      - text: rm
+        is_correct: false
+      - text: touch
+        is_correct: false
+
+  - text: Which user has the highest privileges in Linux?
+    options:
+      - text: root
+        is_correct: true
+      - text: admin
+        is_correct: false
+      - text: sudo
+        is_correct: false
+      - text: user
+        is_correct: false
+
+  - text: What does the 'chmod' command do?
+    options:
+      - text: Changes file permissions
+        is_correct: true
+      - text: Changes ownership
+        is_correct: false
+      - text: Moves files
+        is_correct: false
+      - text: Displays manual
+        is_correct: false
+
+  - text: What is the purpose of the 'man' command?
+    options:
+      - text: Displays the manual for a command
+        is_correct: true
+      - text: Lists all users
+        is_correct: false
+      - text: Creates a new directory
+        is_correct: false
+      - text: Displays system logs
+        is_correct: false
+
+  - text: What is the default shell in most Linux distributions?
+    options:
+      - text: bash
+        is_correct: true
+      - text: zsh
+        is_correct: false
+      - text: sh
+        is_correct: false
+      - text: fish
+        is_correct: false
+
+  - text: Which command is used to copy files?
+    options:
+      - text: cp
+        is_correct: true
+      - text: mv
+        is_correct: false
+      - text: scp
+        is_correct: false
+      - text: copy
+        is_correct: false
+
+  - text: What file contains user account information?
+    options:
+      - text: /etc/passwd
+        is_correct: true
+      - text: /etc/shadow
+        is_correct: false
+      - text: /etc/group
+        is_correct: false
+      - text: /etc/user
+        is_correct: false
+
+  - text: What does the 'grep' command do?
+    options:
+      - text: Searches for text in files
+        is_correct: true
+      - text: Compresses files
+        is_correct: false
+      - text: Updates software
+        is_correct: false
+      - text: Lists directories
+        is_correct: false
+
+  - text: How do you display the contents of a file?
+    options:
+      - text: cat
+        is_correct: true
+      - text: rm
+        is_correct: false
+      - text: mkdir
+        is_correct: false
+      - text: sudo
+        is_correct: false
+
+  - text: What command is used to create a new empty file?
+    options:
+      - text: touch
+        is_correct: true
+      - text: create
+        is_correct: false
+      - text: cp
+        is_correct: false
+      - text: rm
+        is_correct: false
+
+  - text: What is the location of the Linux kernel?
+    options:
+      - text: /boot
+        is_correct: true
+      - text: /root
+        is_correct: false
+      - text: /etc
+        is_correct: false
+      - text: /bin
+        is_correct: false
+
+  - text: Which command is used to see running processes?
+    options:
+      - text: ps
+        is_correct: true
+      - text: top
+        is_correct: false
+      - text: proc
+        is_correct: false
+      - text: htop
+        is_correct: false
+
+  - text: What is the command to reboot a Linux system?
+    options:
+      - text: reboot
+        is_correct: true
+      - text: shutdown -h
+        is_correct: false
+      - text: init 0
+        is_correct: false
+      - text: restart
+        is_correct: false
+
+  - text: Which command is used to schedule a task at a specific time?
+    options:
+      - text: cron
+        is_correct: true
+      - text: task
+        is_correct: false
+      - text: schedule
+        is_correct: false
+      - text: time
+        is_correct: false
+
+  - text: What does 'sudo' allow a user to do?
+    options:
+      - text: Execute commands with superuser privileges
+        is_correct: true
+      - text: Switch users
+        is_correct: false
+      - text: Start the GUI
+        is_correct: false
+      - text: Delete users
+        is_correct: false
+
+  - text: Which command shows disk usage in human-readable format?
+    options:
+      - text: du -h
+        is_correct: true
+      - text: df
+        is_correct: false
+      - text: free
+        is_correct: false
+      - text: disk
+        is_correct: false
+        
+  - text: Which command is used to display the first 10 lines of a file?
+    options:
+      - text: head
+        is_correct: true
+      - text: tail
+        is_correct: false
+      - text: cat
+        is_correct: false
+      - text: more
+        is_correct: false
+
+  - text: Which command is used to display the last 10 lines of a file?
+    options:
+      - text: tail
+        is_correct: true
+      - text: head
+        is_correct: false
+      - text: less
+        is_correct: false
+      - text: echo
+        is_correct: false
+
+  - text: What does the 'df' command display?
+    options:
+      - text: Disk space usage
+        is_correct: true
+      - text: RAM usage
+        is_correct: false
+      - text: File details
+        is_correct: false
+      - text: Directory permissions
+        is_correct: false
+
+  - text: Which command is used to extract a `.tar.gz` file?
+    options:
+      - text: tar -xvzf
+        is_correct: true
+      - text: unzip
+        is_correct: false
+      - text: gunzip
+        is_correct: false
+      - text: extract
+        is_correct: false
+
+  - text: What does the 'alias' command do?
+    options:
+      - text: Creates a shortcut for a command
+        is_correct: true
+      - text: Changes file ownership
+        is_correct: false
+      - text: Updates packages
+        is_correct: false
+      - text: Displays a message
+        is_correct: false
+
+  - text: Which directory contains system-wide configuration files?
+    options:
+      - text: /etc
+        is_correct: true
+      - text: /usr
+        is_correct: false
+      - text: /bin
+        is_correct: false
+      - text: /dev
+        is_correct: false
+
+  - text: What command is used to change file ownership?
+    options:
+      - text: chown
+        is_correct: true
+      - text: chmod
+        is_correct: false
+      - text: usermod
+        is_correct: false
+      - text: own
+        is_correct: false
+
+  - text: Which of the following is a package manager for Debian-based systems?
+    options:
+      - text: apt
+        is_correct: true
+      - text: yum
+        is_correct: false
+      - text: dnf
+        is_correct: false
+      - text: pacman
+        is_correct: false
+
+  - text: Which command is used to search for files?
+    options:
+      - text: find
+        is_correct: true
+      - text: search
+        is_correct: false
+      - text: locate
+        is_correct: false
+      - text: grep
+        is_correct: false
+
+  - text: Which of the following commands will shut down the system immediately?
+    options:
+      - text: shutdown -h now
+        is_correct: true
+      - text: reboot
+        is_correct: false
+      - text: halt -t
+        is_correct: false
+      - text: init 6
+        is_correct: false
+
+  - text: What does the '&' symbol at the end of a Linux command do?
+    options:
+      - text: Runs the command in the background
+        is_correct: true
+      - text: Pipes the command to another
+        is_correct: false
+      - text: Ignores errors
+        is_correct: false
+      - text: Forces execution
+        is_correct: false
+
+  - text: What command is used to display network interface information?
+    options:
+      - text: ifconfig
+        is_correct: true
+      - text: netstat
+        is_correct: false
+      - text: ping
+        is_correct: false
+      - text: traceroute
+        is_correct: false
+
+  - text: What is the default port for SSH?
+    options:
+      - text: 22
+        is_correct: true
+      - text: 80
+        is_correct: false
+      - text: 443
+        is_correct: false
+      - text: 21
+        is_correct: false
+
+  - text: What is the purpose of the 'export' command in Linux?
+    options:
+      - text: Sets environment variables
+        is_correct: true
+      - text: Transfers files
+        is_correct: false
+      - text: Prints a message
+        is_correct: false
+      - text: Exits a script
+        is_correct: false
+
+  - text: What command is used to view real-time log messages?
+    options:
+      - text: tail -f
+        is_correct: true
+      - text: cat
+        is_correct: false
+      - text: grep
+        is_correct: false
+      - text: echo
+        is_correct: false
+
+  - text: What is the Linux command to switch to the root user?
+    options:
+      - text: su
+        is_correct: true
+      - text: root
+        is_correct: false
+      - text: login
+        is_correct: false
+      - text: sudo root
+        is_correct: false
+
+  - text: Which directory contains device files?
+    options:
+      - text: /dev
+        is_correct: true
+      - text: /etc
+        is_correct: false
+      - text: /usr
+        is_correct: false
+      - text: /opt
+        is_correct: false
+
+  - text: What is the maximum permission value in Linux?
+    options:
+      - text: 777
+        is_correct: true
+      - text: 666
+        is_correct: false
+      - text: 999
+        is_correct: false
+      - text: 644
+        is_correct: false
+
+  - text: Which command shows memory usage?
+    options:
+      - text: free
+        is_correct: true
+      - text: mem
+        is_correct: false
+      - text: df
+        is_correct: false
+      - text: stat
+        is_correct: false
+
+  - text: What command is used to display user identity?
+    options:
+      - text: whoami
+        is_correct: true
+      - text: who
+        is_correct: false
+      - text: id
+        is_correct: false
+      - text: user
+        is_correct: false
