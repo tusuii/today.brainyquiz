@@ -105,6 +105,7 @@ class UserQuiz(db.Model):
     quiz_id = db.Column(db.Integer, db.ForeignKey('quizzes.id'), nullable=False)
     score = db.Column(db.Integer, default=0)
     completed_at = db.Column(db.DateTime, nullable=True)
+    pending_completion = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     

@@ -175,8 +175,13 @@ def submit_quiz(user_quiz_id):
             except (ValueError, IndexError):
                 continue
     
-    # Complete the quiz and calculate score
-    QuizService.complete_quiz(user_quiz.id)
+    # Complete the quiz and queue for asynchronous processing
+    result = QuizService.complete_quiz(user_quiz.id)
+    
+    if result:
+        flash('Your quiz has been submitted and is being processed.', 'info')
+    else:
+        flash('There was an issue submitting your quiz. Please try again.', 'danger')
     
     return redirect(url_for('quiz.quiz_result', user_quiz_id=user_quiz.id))
 
@@ -208,12 +213,16 @@ def quiz_result(user_quiz_id):
                 correct_answers[question.id] = option.id
                 break
     
+    # Check if the quiz is still being processed
+    processing = user_quiz.pending_completion and not user_quiz.completed_at
+    
     return render_template('quiz/result.html', 
                           user_quiz=user_quiz, 
                           quiz=quiz, 
                           questions=questions, 
                           user_answers=user_answers,
-                          correct_answers=correct_answers)
+                          correct_answers=correct_answers,
+                          processing=processing)
 
 # API endpoints for AJAX requests
 @quiz.route('/api/quizzes')

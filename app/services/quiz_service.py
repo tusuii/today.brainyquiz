@@ -2,6 +2,7 @@ from app import db
 from app.models import Quiz, Question, Option, UserQuiz, UserAnswer
 from datetime import datetime
 import logging
+from app.tasks import process_quiz_submission, generate_quiz_statistics
 
 # Set up logging
 logging.basicConfig(level=logging.DEBUG)
@@ -131,7 +132,54 @@ class QuizService:
     @staticmethod
     def complete_quiz(user_quiz_id):
         """
-        Complete a quiz attempt and calculate the score
+        Complete a quiz attempt and initiate asynchronous score calculation
+        
+        This method marks the quiz as pending completion and offloads the
+        score calculation to a Celery worker to handle high traffic loads.
+        
+        Args:
+            user_quiz_id (int): ID of the user quiz attempt
+            
+        Returns:
+            UserQuiz: Updated UserQuiz object or None if not found
+        """
+        user_quiz = UserQuiz.query.get(user_quiz_id)
+        if not user_quiz:
+            logging.error(f"UserQuiz with ID {user_quiz_id} not found")
+            return None
+            
+        # Check if already completed
+        if user_quiz.completed_at:
+            logging.warning(f"UserQuiz {user_quiz_id} is already completed")
+            return user_quiz
+        
+        try:
+            # Mark as pending completion but don't set completed_at yet
+            # This will be done by the Celery task
+            user_quiz.pending_completion = True
+            db.session.commit()
+            
+            # Queue the task for asynchronous processing
+            logging.info(f"Queuing quiz {user_quiz_id} for asynchronous processing")
+            process_quiz_submission.delay(user_quiz_id)
+            
+            # Also queue statistics generation
+            generate_quiz_statistics.delay(user_quiz.quiz_id)
+            
+            return user_quiz
+            
+        except Exception as e:
+            logging.error(f"Error queueing quiz completion: {str(e)}")
+            db.session.rollback()
+            return None
+            
+    @staticmethod
+    def calculate_quiz_score(user_quiz_id):
+        """
+        Calculate the score for a quiz attempt (synchronous version)
+        
+        This method is kept for backward compatibility and direct use
+        when asynchronous processing is not needed.
         
         Args:
             user_quiz_id (int): ID of the user quiz attempt

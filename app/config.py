@@ -23,7 +23,8 @@ class DevelopmentConfig(Config):
 class TestingConfig(Config):
     """Testing configuration"""
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = os.environ.get('TEST_DATABASE_URL', 'postgresql://quizuser:quizpassword@db:5432/quizdb_test')
+    SQLALCHEMY_DATABASE_URI = os.environ.get('TEST_DATABASE_URL', 'sqlite:///:memory:')
+    WTF_CSRF_ENABLED = False
 
 class ProductionConfig(Config):
     """Production configuration"""

@@ -5,6 +5,7 @@ from flask_login import LoginManager, current_user
 from flask_wtf.csrf import CSRFProtect
 import os
 from app.config import config
+from app.celery_config import make_celery
 
 # Initialize extensions
 db = SQLAlchemy()
@@ -12,6 +13,9 @@ migrate = Migrate()
 login_manager = LoginManager()
 login_manager.login_view = 'auth.login'
 csrf = CSRFProtect()
+
+# Initialize Celery
+celery = None
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -23,9 +27,19 @@ def create_app(config_name='default'):
     app = Flask(__name__)
     app.config.from_object(config[config_name])
     
+    # Set Celery configuration
+    app.config.update(
+        CELERY_BROKER_URL=os.environ.get('CELERY_BROKER_URL', 'amqp://guest:guest@localhost:5672//'),
+        CELERY_RESULT_BACKEND=os.environ.get('CELERY_RESULT_BACKEND', 'rpc://')
+    )
+    
     # Initialize extensions with app
     db.init_app(app)
     migrate.init_app(app, db)
+    
+    # Initialize Celery
+    global celery
+    celery = make_celery(app)
     
     # Configure Flask-Login with stronger session handling
     login_manager.init_app(app)
