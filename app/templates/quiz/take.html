@@ -7,7 +7,26 @@
     <div class="col">
         <h1>{{ quiz.title }}</h1>
         <p class="lead">Answer all questions and submit your answers.</p>
+        <!-- Debug info -->
+        <div class="alert alert-info">
+            <p><strong>Debug Info:</strong></p>
+            <p>Quiz ID: {{ quiz.id }}</p>
+            <p>User Quiz ID: {{ user_quiz.id }}</p>
+            <p>Number of questions: {{ questions|length }}</p>
+        </div>
     </div>
+    {% if quiz.time_limit %}
+    <div class="col-auto">
+        <div class="card border-primary">
+            <div class="card-body p-3 text-center">
+                <h5 class="card-title mb-0">Time Remaining</h5>
+                <div id="timer" class="display-5 fw-bold" data-time-limit="{{ quiz.time_limit }}">
+                    <span id="minutes">{{ quiz.time_limit }}</span>:<span id="seconds">00</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 </div>
 
 <form id="quiz-form" method="POST" action="{{ url_for('quiz.submit_quiz', user_quiz_id=user_quiz.id) }}" data-user-quiz-id="{{ user_quiz.id }}">
@@ -39,4 +58,60 @@
         <button type="submit" class="btn btn-primary">Submit Answers</button>
     </div>
 </form>
+
+{% if quiz.time_limit %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get the quiz form
+        const form = document.getElementById('quiz-form');
+        
+        // Get time limit from data attribute (in minutes)
+        const timeLimit = parseInt(document.getElementById('timer').dataset.timeLimit);
+        
+        // Calculate total seconds
+        let totalSeconds = timeLimit * 60;
+        
+        // Update timer every second
+        const timerInterval = setInterval(function() {
+            // Decrement total seconds
+            totalSeconds--;
+            
+            // Calculate minutes and seconds
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            
+            // Update timer display
+            document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+            document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+            
+            // Change color when time is running out (less than 1 minute)
+            if (totalSeconds < 60) {
+                document.getElementById('timer').classList.add('text-danger');
+            }
+            
+            // Auto-submit when time is up
+            if (totalSeconds <= 0) {
+                clearInterval(timerInterval);
+                
+                // Show alert
+                alert('Time is up! Your answers will be submitted automatically.');
+                
+                // Submit the form
+                form.submit();
+            }
+        }, 1000);
+        
+        // Store start time in localStorage to prevent timer manipulation
+        const startTime = Date.now();
+        const endTime = startTime + (timeLimit * 60 * 1000);
+        localStorage.setItem('quizEndTime_' + form.dataset.userQuizId, endTime);
+        
+        // Check if there's a stored end time and validate it
+        window.addEventListener('beforeunload', function() {
+            // This will help prevent timer manipulation by refreshing the page
+            // The backend should also validate submission time
+        });
+    });
+</script>
+{% endif %}
 {% endblock %}

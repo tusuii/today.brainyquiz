@@ -46,6 +46,8 @@ class Quiz(db.Model):
     # We'll handle the is_live column in a way that works even if the column doesn't exist yet
     # Using server_default ensures it works with existing records
     is_live = db.Column(db.Boolean, server_default='false', default=False)  # Controls visibility to regular users
+    # Time limit in minutes, null means no time limit
+    time_limit = db.Column(db.Integer, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     

@@ -133,18 +133,8 @@ def toggle_quiz_live(quiz_id):
     quiz = Quiz.query.get_or_404(quiz_id)
     
     try:
-        # Try to toggle the is_live status
-        current_status = getattr(quiz, 'is_live', False)
-        setattr(quiz, 'is_live', not current_status)
-        
-        # Check if we need to add the column to the database
-        from sqlalchemy import inspect
-        inspector = inspect(db.engine)
-        if 'is_live' not in [col['name'] for col in inspector.get_columns('quizzes')]:
-            # Add the column to the database
-            from sqlalchemy import text
-            db.session.execute(text("ALTER TABLE quizzes ADD COLUMN is_live BOOLEAN DEFAULT FALSE"))
-        
+        # Toggle the is_live status
+        quiz.is_live = not quiz.is_live
         db.session.commit()
         
         status = "published" if getattr(quiz, 'is_live', False) else "unpublished"
@@ -155,6 +145,41 @@ def toggle_quiz_live(quiz_id):
     
     # Redirect back to the referring page (either quiz list or quiz detail)
     return redirect(request.referrer or url_for('admin.list_quizzes'))
+
+@admin.route('/quizzes/<int:quiz_id>/set-time-limit', methods=['POST'])
+@admin_required
+def set_time_limit(quiz_id):
+    """Set the time limit for a quiz"""
+    quiz = Quiz.query.get_or_404(quiz_id)
+    
+    try:
+        # Get time limit from form
+        time_limit = request.form.get('time_limit', '')
+        
+        # Convert to integer or None if empty
+        if time_limit.strip():
+            time_limit = int(time_limit)
+            if time_limit < 1 or time_limit > 180:
+                raise ValueError("Time limit must be between 1 and 180 minutes")
+        else:
+            time_limit = None
+        
+        # Update quiz time limit
+        quiz.time_limit = time_limit
+        db.session.commit()
+        
+        if time_limit:
+            flash(f'Time limit for "{quiz.title}" set to {time_limit} minutes')
+        else:
+            flash(f'Time limit for "{quiz.title}" removed')
+    except ValueError as e:
+        db.session.rollback()
+        flash(f'Error setting time limit: {str(e)}')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error updating quiz: {str(e)}')
+    
+    return redirect(url_for('admin.view_quiz', quiz_id=quiz.id))
 
 @admin.route('/users')
 @admin_required

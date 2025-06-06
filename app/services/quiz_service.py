@@ -1,6 +1,10 @@
 from app import db
 from app.models import Quiz, Question, Option, UserQuiz, UserAnswer
 from datetime import datetime
+import logging
+
+# Set up logging
+logging.basicConfig(level=logging.DEBUG)
 
 class QuizService:
     """Service for handling quiz operations"""
@@ -40,19 +44,38 @@ class QuizService:
         Returns:
             UserQuiz: Created UserQuiz object or None if quiz not found
         """
+        logging.debug(f"QuizService.start_quiz called with user_id={user.id}, quiz_id={quiz_id}")
+        
         quiz = Quiz.query.get(quiz_id)
         if not quiz:
+            logging.error(f"Quiz with ID {quiz_id} not found")
             return None
         
-        # Create a new user quiz attempt
-        user_quiz = UserQuiz(
-            user=user,
-            quiz=quiz
-        )
-        db.session.add(user_quiz)
-        db.session.commit()
+        logging.debug(f"Found quiz: {quiz.title} (ID: {quiz.id})")
         
-        return user_quiz
+        # Check if quiz has questions
+        question_count = Question.query.filter_by(quiz_id=quiz.id).count()
+        logging.debug(f"Quiz has {question_count} questions")
+        
+        if question_count == 0:
+            logging.warning(f"Quiz {quiz_id} has no questions!")
+        
+        # Create a new user quiz attempt
+        try:
+            # Explicitly set created_at to ensure it's set to the current time
+            user_quiz = UserQuiz(
+                user=user,
+                quiz=quiz,
+                created_at=datetime.utcnow()
+            )
+            db.session.add(user_quiz)
+            db.session.commit()
+            logging.debug(f"Created new UserQuiz with ID {user_quiz.id}, created_at: {user_quiz.created_at}")
+            return user_quiz
+        except Exception as e:
+            logging.error(f"Error creating UserQuiz: {str(e)}")
+            db.session.rollback()
+            return None
     
     @staticmethod
     def submit_answer(user_quiz_id, question_id, option_id):

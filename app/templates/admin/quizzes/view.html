@@ -60,6 +60,17 @@
                     <div class="mb-3">
                         <strong>Attempts:</strong> {{ quiz.user_quizzes.count() }}
                     </div>
+                    <div class="mb-3">
+                        <strong>Time Limit:</strong> 
+                        {% if quiz.time_limit %}
+                            {{ quiz.time_limit }} minutes
+                        {% else %}
+                            No time limit
+                        {% endif %}
+                        <button class="btn btn-sm btn-outline-primary ms-2" data-bs-toggle="modal" data-bs-target="#timeModal">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -100,6 +111,32 @@
                 </div>
                 {% endfor %}
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Time Limit Modal -->
+<div class="modal fade" id="timeModal" tabindex="-1" aria-labelledby="timeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="timeModalLabel">Set Quiz Time Limit</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ url_for('admin.set_time_limit', quiz_id=quiz.id) }}" method="post">
+                <div class="modal-body">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="mb-3">
+                        <label for="time_limit" class="form-label">Time Limit (minutes)</label>
+                        <input type="number" class="form-control" id="time_limit" name="time_limit" value="{{ quiz.time_limit or '' }}" min="1" max="180">
+                        <div class="form-text">Leave empty for no time limit. Maximum 180 minutes (3 hours).</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
