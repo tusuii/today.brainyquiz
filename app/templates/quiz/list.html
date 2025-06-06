@@ -5,7 +5,7 @@
 {% block content %}
 <div class="row mb-4">
     <div class="col">
-        <h1>Available Quizzes</h1>
+        <h1 style="color: var(--primary);">Available Quizzes</h1>
         <p class="lead">Select a quiz to begin</p>
     </div>
 </div>
@@ -14,10 +14,15 @@
     {% for quiz in quizzes %}
     <div class="col">
         <div class="card h-100 quiz-card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">{{ quiz.title }} {% if current_user.is_admin %}<span class="badge {% if quiz.is_live_safe %}bg-success{% else %}bg-secondary{% endif %}">{% if quiz.is_live_safe %}Live{% else %}Draft{% endif %}</span>{% endif %}</h5>
+            </div>
             <div class="card-body">
-                <h5 class="card-title">{{ quiz.title }} {% if current_user.is_admin %}<span class="badge {% if quiz.is_live_safe %}bg-success{% else %}bg-secondary{% endif %}">{% if quiz.is_live_safe %}Live{% else %}Draft{% endif %}</span>{% endif %}</h5>
                 <p class="card-text">{{ quiz.description }}</p>
-                <p class="card-text"><small class="text-muted">{{ quiz.questions.count() }} questions</small></p>
+                <p class="card-text"><small class="text-secondary">{{ quiz.questions.count() }} questions</small></p>
+                {% if quiz.time_limit %}
+                <p class="card-text"><span class="badge" style="background-color: var(--highlight); color: var(--dark);"><i class="fas fa-clock me-1"></i>{{ quiz.time_limit }} minutes</span></p>
+                {% endif %}
             </div>
             <div class="card-footer bg-transparent">
                 <a href="{{ url_for('quiz.view_quiz', quiz_id=quiz.id) }}" class="btn btn-primary">View Quiz</a>

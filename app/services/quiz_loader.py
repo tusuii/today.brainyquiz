@@ -39,6 +39,35 @@ class QuizLoader:
         if not quiz_data.get('questions') or not isinstance(quiz_data['questions'], list):
             raise ValueError("Quiz must have questions as a list")
         
+        # Validate question structure
+        for i, question in enumerate(quiz_data.get('questions', [])):
+            if not isinstance(question, dict):
+                raise ValueError(f"Question {i+1} must be a dictionary")
+            if not question.get('text'):
+                raise ValueError(f"Question {i+1} is missing text field")
+            
+            # Validate options
+            if not question.get('options') or not isinstance(question['options'], list):
+                raise ValueError(f"Question '{question.get('text', f'#{i+1}')}' must have options as a list")
+            
+            # Check if at least one option is correct
+            has_correct = False
+            for j, option in enumerate(question.get('options', [])):
+                if not isinstance(option, dict):
+                    raise ValueError(f"Option {j+1} in question '{question.get('text', f'#{i+1}')}' must be a dictionary")
+                if 'text' not in option:
+                    raise ValueError(f"Option {j+1} in question '{question.get('text', f'#{i+1}')}' is missing text field")
+                
+                # Check for correct answer
+                is_correct = option.get('correct', False) or option.get('is_correct', False)
+                if is_correct:
+                    has_correct = True
+            
+            if not has_correct:
+                logging.warning(f"Question '{question.get('text', f'#{i+1}')}' has no correct answer marked")
+        
+        logging.info(f"Quiz validation passed: {quiz_data['title']}")
+        
         # Create quiz in database
         try:
             quiz = Quiz(
@@ -77,8 +106,16 @@ class QuizLoader:
                                 # Handle both 'correct' and 'is_correct' fields in YAML files
                                 is_correct = opt_data.get('correct', False) or opt_data.get('is_correct', False)
                                 
-                                # Ensure text is a string
-                                option_text = str(opt_data['text'])
+                                # Ensure text is a string and handle numeric values
+                                if 'text' in opt_data:
+                                    # Convert any value to string explicitly
+                                    option_text = str(opt_data['text']).strip()
+                                    if not option_text:
+                                        logging.warning(f"Empty option text for question {question.id}")
+                                        continue
+                                else:
+                                    logging.warning(f"Option missing 'text' field for question {question.id}")
+                                    continue
                                 
                                 option = Option(
                                     question_id=question.id,  # Use ID directly

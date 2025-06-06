@@ -5,10 +5,10 @@
 {% block content %}
 <div class="row mb-4">
     <div class="col">
-        <h1>{{ quiz.title }}</h1>
+        <h1 style="color: var(--primary);">{{ quiz.title }}</h1>
         <p class="lead">Answer all questions and submit your answers.</p>
         <!-- Debug info -->
-        <div class="alert alert-info">
+        <div class="alert alert-info" style="display: none;">
             <p><strong>Debug Info:</strong></p>
             <p>Quiz ID: {{ quiz.id }}</p>
             <p>User Quiz ID: {{ user_quiz.id }}</p>
@@ -17,9 +17,9 @@
     </div>
     {% if quiz.time_limit %}
     <div class="col-auto">
-        <div class="card border-primary">
-            <div class="card-body p-3 text-center">
-                <h5 class="card-title mb-0">Time Remaining</h5>
+        <div class="timer-container">
+            <div class="p-3 text-center">
+                <h5 class="mb-1"><i class="fas fa-clock me-2"></i>Time Remaining</h5>
                 <div id="timer" class="display-5 fw-bold" data-time-limit="{{ quiz.time_limit }}">
                     <span id="minutes">{{ quiz.time_limit }}</span>:<span id="seconds">00</span>
                 </div>
@@ -31,16 +31,14 @@
 
 <form id="quiz-form" method="POST" action="{{ url_for('quiz.submit_quiz', user_quiz_id=user_quiz.id) }}" data-user-quiz-id="{{ user_quiz.id }}">
     {% for question in questions %}
-    <div class="card mb-4">
-        <div class="card-header">
-            <h5 class="mb-0">Question {{ loop.index }}</h5>
-        </div>
-        <div class="card-body">
-            <p class="card-text">{{ question.text }}</p>
+    <div class="quiz-container mb-4">
+        <div class="question-container">
+            <h5 class="mb-3" style="color: var(--primary);">Question {{ loop.index }}</h5>
+            <p class="card-text fw-bold">{{ question.text }}</p>
             
-            <div class="mt-3">
+            <div class="option-container mt-4">
                 {% for option in question.options %}
-                <div class="form-check mb-2">
+                <div class="form-check mb-3">
                     <input class="form-check-input option-input" type="radio" name="question_{{ question.id }}" id="option_{{ option.id }}" value="{{ option.id }}" 
                         {% if user_answers and question.id in user_answers and user_answers[question.id] == option.id %}checked{% endif %}>
                     <label class="form-check-label option-label" for="option_{{ option.id }}">
@@ -55,7 +53,7 @@
     
     <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-4">
         <a href="{{ url_for('quiz.list_quizzes') }}" class="btn btn-secondary">Cancel</a>
-        <button type="submit" class="btn btn-primary">Submit Answers</button>
+        <button type="submit" class="btn btn-accent"><i class="fas fa-check-circle me-2"></i>Submit Answers</button>
     </div>
 </form>
 
@@ -87,6 +85,7 @@
             // Change color when time is running out (less than 1 minute)
             if (totalSeconds < 60) {
                 document.getElementById('timer').classList.add('text-danger');
+                document.getElementById('timer').style.color = 'var(--ut-orange)';
             }
             
             // Auto-submit when time is up
