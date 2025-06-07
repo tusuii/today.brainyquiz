@@ -7,7 +7,7 @@ import psycopg2
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 
 # Database connection parameters from environment variables
-DB_HOST = os.environ.get('DB_HOST', 'db')
+DB_HOST = os.environ.get('DB_HOST', 'postgres')
 DB_PORT = os.environ.get('DB_PORT', '5432')
 DB_NAME = os.environ.get('DB_NAME', 'quizdb')
 DB_USER = os.environ.get('DB_USER', 'quizuser')

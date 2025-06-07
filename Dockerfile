@@ -6,6 +6,7 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     postgresql-client \
+    netcat-traditional \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements and install Python dependencies

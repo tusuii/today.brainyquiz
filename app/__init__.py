@@ -27,6 +27,13 @@ def create_app(config_name='default'):
     app = Flask(__name__)
     app.config.from_object(config[config_name])
     
+    # Ensure debug is off in production
+    if os.environ.get('FLASK_ENV') == 'production':
+        app.debug = False
+        app.testing = False
+        app.config['DEBUG'] = False
+        app.config['TESTING'] = False
+    
     # Set Celery configuration
     app.config.update(
         CELERY_BROKER_URL=os.environ.get('CELERY_BROKER_URL', 'amqp://guest:guest@localhost:5672//'),
@@ -63,6 +70,9 @@ def create_app(config_name='default'):
     
     from app.routes.api import api as api_blueprint
     app.register_blueprint(api_blueprint, url_prefix='/api')
+    
+    from app.routes.health import health_bp
+    app.register_blueprint(health_bp)
     
     # Create a route for the home page
     @app.route('/')

@@ -8,7 +8,7 @@ from app.models import UserQuiz, UserAnswer, Option
 
 
 def test_complete_quiz_async(app, session, test_user, test_quiz, mock_celery_task):
-    """Test that complete_quiz queues a task for asynchronous processing."""
+    """Test that complete_quiz performs immediate scoring and queues statistics task."""
     # Create a user quiz
     user_quiz = UserQuiz(
         user_id=test_user.id,
@@ -24,15 +24,16 @@ def test_complete_quiz_async(app, session, test_user, test_quiz, mock_celery_tas
     # Call the complete_quiz method
     result = QuizService.complete_quiz(user_quiz.id)
     
-    # Verify the result
+    # Verify the result - score should be calculated immediately
     assert result is not None
     assert result.id == user_quiz.id
-    assert result.pending_completion is True
-    assert result.completed_at is None
+    assert result.pending_completion is False  # Now false as quiz is completed immediately
+    assert result.completed_at is not None  # Should have completion timestamp
     
-    # Verify that the task was queued
-    mock_process.assert_called_once_with(user_quiz.id)
-    mock_stats.assert_called_once_with(test_quiz.id)
+    # Verify that only the statistics task was queued (not the process task)
+    mock_process.apply_async.assert_not_called()  # Process task should not be called
+    # Check that apply_async was called with the correct args parameter
+    mock_stats.apply_async.assert_called_once_with(args=[test_quiz.id], countdown=0)
 
 
 def test_calculate_quiz_score(app, session, test_user, test_quiz):

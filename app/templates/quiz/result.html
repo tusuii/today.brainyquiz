@@ -12,6 +12,7 @@
 
 <div class="quiz-result-summary">
     {% if processing %}
+    <!-- This section is kept for backward compatibility but should rarely be shown now -->
     <div class="alert alert-info">
         <div class="d-flex align-items-center">
             <div class="spinner-border text-primary me-3" role="status">
@@ -19,7 +20,7 @@
             </div>
             <div>
                 <h4 class="mb-1">Your quiz is being processed</h4>
-                <p class="mb-0">Please wait a moment while we calculate your results. This page will automatically refresh.</p>
+                <p class="mb-0">Please wait a moment while we calculate your results.</p>
             </div>
         </div>
     </div>
@@ -93,12 +94,4 @@
 
 {% block scripts %}
 {{ super() }}
-{% if processing %}
-<script>
-    // Auto-refresh the page every 5 seconds when quiz is being processed
-    setTimeout(function() {
-        window.location.reload();
-    }, 5000);
-</script>
-{% endif %}
 {% endblock %}

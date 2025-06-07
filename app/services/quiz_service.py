@@ -132,10 +132,10 @@ class QuizService:
     @staticmethod
     def complete_quiz(user_quiz_id):
         """
-        Complete a quiz attempt and initiate asynchronous score calculation
+        Complete a quiz attempt with immediate score calculation
         
-        This method marks the quiz as pending completion and offloads the
-        score calculation to a Celery worker to handle high traffic loads.
+        This method calculates the score immediately and shows results to the user,
+        while still queuing background tasks for additional processing.
         
         Args:
             user_quiz_id (int): ID of the user quiz attempt
@@ -143,33 +143,85 @@ class QuizService:
         Returns:
             UserQuiz: Updated UserQuiz object or None if not found
         """
+        logging.info(f"Starting complete_quiz for user_quiz_id={user_quiz_id}")
+        
         user_quiz = UserQuiz.query.get(user_quiz_id)
         if not user_quiz:
             logging.error(f"UserQuiz with ID {user_quiz_id} not found")
             return None
+        
+        logging.info(f"Found UserQuiz: id={user_quiz.id}, user_id={user_quiz.user_id}, quiz_id={user_quiz.quiz_id}")
             
         # Check if already completed
         if user_quiz.completed_at:
-            logging.warning(f"UserQuiz {user_quiz_id} is already completed")
+            logging.warning(f"UserQuiz {user_quiz_id} is already completed at {user_quiz.completed_at}")
             return user_quiz
         
         try:
-            # Mark as pending completion but don't set completed_at yet
-            # This will be done by the Celery task
-            user_quiz.pending_completion = True
+            # IMMEDIATE CALCULATION: Calculate the score synchronously
+            logging.info(f"Starting immediate score calculation for UserQuiz {user_quiz_id}")
+            
+            # Get all questions for this quiz
+            questions = Question.query.filter_by(quiz_id=user_quiz.quiz_id).all()
+            total_questions = len(questions)
+            logging.info(f"Found {total_questions} questions for quiz {user_quiz.quiz_id}")
+            
+            if total_questions == 0:
+                # No questions to score
+                logging.warning(f"No questions found for quiz {user_quiz.quiz_id}, setting score to 0")
+                user_quiz.score = 0
+                user_quiz.completed_at = datetime.utcnow()
+                db.session.commit()
+                return user_quiz
+            
+            # Get all user answers in a single query
+            user_answers = UserAnswer.query.filter_by(user_quiz_id=user_quiz.id).all()
+            logging.info(f"Found {len(user_answers)} answers for UserQuiz {user_quiz_id}")
+            
+            # Create a mapping of question_id to selected option_id for quick lookup
+            answer_map = {answer.question_id: answer.option_id for answer in user_answers}
+            
+            # Get all correct options for these questions in a single query
+            correct_options = db.session.query(Option.question_id, Option.id).filter(
+                Option.question_id.in_([q.id for q in questions]),
+                Option.is_correct == True
+            ).all()
+            logging.info(f"Found {len(correct_options)} correct options for quiz {user_quiz.quiz_id}")
+            
+            # Create a mapping of question_id to correct option_id
+            correct_map = {question_id: option_id for question_id, option_id in correct_options}
+            
+            # Calculate score by comparing the two maps
+            score = sum(1 for question_id, correct_option_id in correct_map.items() 
+                      if answer_map.get(question_id) == correct_option_id)
+            
+            logging.info(f"Calculated score: {score}/{total_questions} for UserQuiz {user_quiz_id}")
+            
+            # Update user quiz with score and completion time
+            user_quiz.score = score
+            user_quiz.completed_at = datetime.utcnow()
+            user_quiz.pending_completion = False  # Mark as completed immediately
+            
+            # Commit the changes
+            logging.info(f"Committing score and completion time for UserQuiz {user_quiz_id}")
             db.session.commit()
             
-            # Queue the task for asynchronous processing
-            logging.info(f"Queuing quiz {user_quiz_id} for asynchronous processing")
-            process_quiz_submission.delay(user_quiz_id)
+            # Still queue the statistics generation task in the background
+            logging.info(f"Queueing statistics generation for quiz {user_quiz.quiz_id}")
+            try:
+                generate_quiz_statistics.apply_async(args=[user_quiz.quiz_id], countdown=0)
+                logging.info(f"Successfully queued statistics task for quiz {user_quiz.quiz_id}")
+            except Exception as stats_error:
+                # Don't fail the whole method if just the stats task fails
+                logging.error(f"Failed to queue statistics task: {str(stats_error)}")
             
-            # Also queue statistics generation
-            generate_quiz_statistics.delay(user_quiz.quiz_id)
-            
+            logging.info(f"Successfully completed quiz {user_quiz_id} with score {score}")
             return user_quiz
             
         except Exception as e:
-            logging.error(f"Error queueing quiz completion: {str(e)}")
+            logging.error(f"Error completing quiz: {str(e)}")
+            import traceback
+            logging.error(traceback.format_exc())
             db.session.rollback()
             return None
             
@@ -191,26 +243,35 @@ class QuizService:
         if not user_quiz:
             return None
         
-        # Calculate score
-        score = 0
-        total_questions = 0
-        
         # Get all questions for this quiz
         questions = Question.query.filter_by(quiz_id=user_quiz.quiz_id).all()
         total_questions = len(questions)
         
-        # Check each answer
-        for question in questions:
-            user_answer = UserAnswer.query.filter_by(
-                user_quiz_id=user_quiz.id,
-                question_id=question.id
-            ).first()
-            
-            if user_answer:
-                # Check if the selected option is correct
-                option = Option.query.get(user_answer.option_id)
-                if option and option.is_correct:
-                    score += 1
+        if total_questions == 0:
+            # No questions to score
+            user_quiz.score = 0
+            user_quiz.completed_at = datetime.utcnow()
+            db.session.commit()
+            return user_quiz
+        
+        # Get all user answers in a single query
+        user_answers = UserAnswer.query.filter_by(user_quiz_id=user_quiz.id).all()
+        
+        # Create a mapping of question_id to selected option_id for quick lookup
+        answer_map = {answer.question_id: answer.option_id for answer in user_answers}
+        
+        # Get all correct options for these questions in a single query
+        correct_options = db.session.query(Option.question_id, Option.id).filter(
+            Option.question_id.in_([q.id for q in questions]),
+            Option.is_correct == True
+        ).all()
+        
+        # Create a mapping of question_id to correct option_id
+        correct_map = {question_id: option_id for question_id, option_id in correct_options}
+        
+        # Calculate score by comparing the two maps
+        score = sum(1 for question_id, correct_option_id in correct_map.items() 
+                  if answer_map.get(question_id) == correct_option_id)
         
         # Update user quiz with score and completion time
         user_quiz.score = score

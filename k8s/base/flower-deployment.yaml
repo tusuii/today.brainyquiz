@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flower
+  namespace: exam-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flower
+  template:
+    metadata:
+      labels:
+        app: flower
+    spec:
+      containers:
+      - name: flower
+        image: exam-app:latest
+        imagePullPolicy: IfNotPresent
+        command: ["/bin/sh", "-c", "celery -A app.celery flower --port=5555 --address=0.0.0.0"]
+        ports:
+        - containerPort: 5555
+        env:
+        - name: FLASK_APP
+          value: "app"
+        - name: CELERY_BROKER_URL
+          value: "amqp://guest:guest@rabbitmq:5672//"
+        - name: CELERY_RESULT_BACKEND
+          value: "rpc://"
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"

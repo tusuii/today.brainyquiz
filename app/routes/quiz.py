@@ -6,7 +6,7 @@ from app.services.quiz_service import QuizService
 import logging
 
 # Set up logging
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig()
 
 quiz = Blueprint('quiz', __name__)
 
@@ -175,11 +175,16 @@ def submit_quiz(user_quiz_id):
             except (ValueError, IndexError):
                 continue
     
-    # Complete the quiz and queue for asynchronous processing
+    # Complete the quiz with immediate score calculation
     result = QuizService.complete_quiz(user_quiz.id)
     
-    if result:
-        flash('Your quiz has been submitted and is being processed.', 'info')
+    # Check if the quiz is already completed, which means it was successful
+    # even if result is None (could happen if already completed before)
+    updated_user_quiz = UserQuiz.query.get(user_quiz.id)
+    if updated_user_quiz and updated_user_quiz.completed_at:
+        flash('Your quiz has been submitted and scored.', 'success')
+    elif result:
+        flash('Your quiz has been submitted and scored.', 'success')
     else:
         flash('There was an issue submitting your quiz. Please try again.', 'danger')
     
@@ -213,7 +218,8 @@ def quiz_result(user_quiz_id):
                 correct_answers[question.id] = option.id
                 break
     
-    # Check if the quiz is still being processed
+    # With our new immediate calculation approach, processing should be false
+    # But we'll keep the check for backward compatibility
     processing = user_quiz.pending_completion and not user_quiz.completed_at
     
     return render_template('quiz/result.html', 

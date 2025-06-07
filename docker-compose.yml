@@ -9,7 +9,7 @@ services:
       - .:/app
     environment:
       - FLASK_APP=app
-      - FLASK_ENV=development
+      - FLASK_ENV=production
       - DATABASE_URL=postgresql://quizuser:quizpassword@db:5432/quizdb
       - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672//
       - CELERY_RESULT_BACKEND=rpc://
@@ -29,6 +29,11 @@ services:
     ports:
       - "5433:5432"
     restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U quizuser -d quizdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   rabbitmq:
     image: rabbitmq:3-management
@@ -41,10 +46,15 @@ services:
       - RABBITMQ_DEFAULT_USER=guest
       - RABBITMQ_DEFAULT_PASS=guest
     restart: always
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   celery_worker:
     build: .
-    command: celery -A app.celery worker --loglevel=info
+    command: ./celery_worker_start.sh
     volumes:
       - .:/app
     environment:
@@ -60,7 +70,7 @@ services:
 
   flower:
     build: .
-    command: celery -A app.celery flower --port=5555
+    command: ./flower_start.sh
     ports:
       - "5555:5555"
     environment:

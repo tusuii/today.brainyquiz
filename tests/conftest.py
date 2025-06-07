@@ -5,7 +5,8 @@ This file contains pytest fixtures and configuration for testing.
 import os
 import sys
 import pytest
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
+from datetime import datetime, timedelta
 
 # Set test environment variables before importing app
 os.environ['FLASK_ENV'] = 'testing'
@@ -153,8 +154,14 @@ def mock_celery_task():
     This fixture returns the mocks without executing the task functions,
     allowing tests to verify that tasks are queued correctly.
     """
-    with patch('app.services.quiz_service.process_quiz_submission.delay') as mock_process:
-        with patch('app.services.quiz_service.generate_quiz_statistics.delay') as mock_stats:
+    # Since we're using apply_async in the service, we need to mock it directly
+    # We'll use a simpler approach by just mocking the task objects themselves
+    with patch('app.services.quiz_service.process_quiz_submission') as mock_process:
+        with patch('app.services.quiz_service.generate_quiz_statistics') as mock_stats:
+            # Configure the mocks to have apply_async method
+            mock_process.apply_async = MagicMock()
+            mock_stats.apply_async = MagicMock()
+            
             # Return the mocks without executing the task functions
             # This allows tests to verify that tasks are queued correctly
             yield (mock_process, mock_stats)
